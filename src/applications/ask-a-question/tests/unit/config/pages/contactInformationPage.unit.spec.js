@@ -1,78 +1,163 @@
 import React from 'react';
 import { expect } from 'chai';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
-import _ from 'lodash';
+import { render, fireEvent } from '@testing-library/react';
 
 import ContactInformationPage from '../../../../config/pages/contactInformationPage';
 import AskAQuestionFormConfig from '../../../../config/form';
 
-import {DefinitionTester} from "platform/testing/unit/schemaform-utils";
+import { DefinitionTester } from 'platform/testing/unit/schemaform-utils';
 import fullName from 'platform/forms-system/src/js/definitions/fullName';
 import { uiSchema as addressUI } from '../../../../contactInformation/address/address';
-import {preferredContactMethodTitle} from "../../../../content/labels";
+import { preferredContactMethodTitle } from '../../../../content/labels';
 
 const address = addressUI();
 
-describe("Contact Information Page", () => {
+describe('Contact Information Page', () => {
+  const radioButtonClick = new MouseEvent('click', {
+    bubbles: true,
+    cancelable: true,
+  });
 
-    it('should require full name', () => {
-        const {getByLabelText} = render(
-            <DefinitionTester
-                schema={ContactInformationPage.schema}
-                uiSchema={ContactInformationPage.uiSchema}
-                definitions={AskAQuestionFormConfig.defaultDefinitions}
-            />);
+  it('should require full name', () => {
+    const { getByText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
 
-        const firstName = getByLabelText(fullName.first["ui:title"], { exact: false });
-        const lastName = getByLabelText(fullName.last["ui:title"], { exact: false });
-
-        expect(firstName).to.have.property('required', true);
-        expect(lastName).to.have.property('required', true);
+    const firstName = getByText(fullName.first['ui:title'], {
+      exact: false,
+    });
+    const lastName = getByText(fullName.last['ui:title'], {
+      exact: false,
     });
 
-    it("should require preferred contact method", () => {
-        const {getByText} = render(
-            <DefinitionTester
-                schema={ContactInformationPage.schema}
-                uiSchema={ContactInformationPage.uiSchema}
-                definitions={AskAQuestionFormConfig.defaultDefinitions}
-            />);
+    expect(firstName).to.contain.text('Required');
+    expect(lastName).to.contain.text('Required');
+  });
 
-        const preferredContactMethod = getByText(preferredContactMethodTitle, { exact: false });
+  it('should require preferred contact method', () => {
+    const { getByText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
 
-        expect(preferredContactMethod).to.contain.text("Required");
+    const preferredContactMethod = getByText(preferredContactMethodTitle, {
+      exact: false,
     });
 
-    it("should require country", () => {
-        const {getByLabelText} = render(
-            <DefinitionTester
-                schema={ContactInformationPage.schema}
-                uiSchema={ContactInformationPage.uiSchema}
-                definitions={AskAQuestionFormConfig.defaultDefinitions}
-            />);
+    expect(preferredContactMethod).to.contain.text('Required');
+  });
 
-        const country = getByLabelText(address.country["ui:title"], { exact: false });
+  it('should require country', () => {
+    const { getByLabelText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
 
-        expect(country).to.have.property('required', true);
+    const country = getByLabelText(address.country['ui:title'], {
+      exact: false,
     });
 
-    it('should require email when preferred contact method is email', async () => {
-        const {getAllByLabelText, getByText} = render(
-            <DefinitionTester
-                schema={ContactInformationPage.schema}
-                uiSchema={ContactInformationPage.uiSchema}
-                definitions={AskAQuestionFormConfig.defaultDefinitions}
-            />
-        );
+    expect(country).to.have.property('required', true);
+  });
 
-        fireEvent.click(getByText("Email (Recommended)"));
+  it('should require email when preferred contact method is email', async () => {
+    const { getAllByText, getByText, getByRole } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
 
-        const emails = getAllByLabelText("Email address", {exact: false});
-        expect(emails.length).to.equal(2);
-        expect(emails[0]).to.have.property("required", true);
-        expect(emails[0]).to.have.property("required", true);
+    fireEvent.click(getByText('Phone'), radioButtonClick);
+    fireEvent.click(getByText('Email (Recommended)'), radioButtonClick);
+
+    const emails = getAllByText('Email address', { exact: false });
+    const reEnterEmail = getByRole('Re-enter', { exact: false }).querySelector(
+      'input',
+    );
+
+    fireEvent.change(reEnterEmail, { target: { value: 'jane.doe@va.gov' } });
+
+    expect(emails[0]).to.contain.text('Required');
+    expect(emails[1]).to.contain.text('Required');
+  });
+
+  it('should require daytime phone when preferred contact method is phone', async () => {
+    const { getByText, getByLabelText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
+
+    fireEvent.click(getByText('Phone'), radioButtonClick);
+
+    const daytimePhone = getByText('Daytime phone', { exact: false });
+    const country = getByLabelText(address.country['ui:title'], {
+      exact: false,
     });
 
+    expect(country).to.have.property('required', true);
+    expect(daytimePhone).to.contain.text('Required');
+  });
 
+  it('should require street, city, state, and zipCode when preferred contact method is US mail and United States is selected for country', async () => {
+    const { getByText, queryAllByText, getByLabelText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
 
+    fireEvent.click(getByText('US Mail'), radioButtonClick);
+
+    const country = getByLabelText(address.country['ui:title'], {
+      exact: false,
+    });
+    const street = getByText('Street', { exact: false });
+    const city = getByText('City', { exact: false });
+    const zipCode = getByText('Zip code', { exact: false });
+    const states = queryAllByText('State', { exact: false });
+
+    expect(states[1]).to.contain.text('Required'); // this is so janky
+    expect(country).to.have.property('required', true);
+    expect(street).to.contain.text('Required');
+    expect(city).to.contain.text('Required');
+    expect(zipCode).to.contain.text('Required');
+  });
+
+  it('should require not state for Aruba', async () => {
+    const { getByText, queryAllByText, getByLabelText } = render(
+      <DefinitionTester
+        schema={ContactInformationPage.schema}
+        uiSchema={ContactInformationPage.uiSchema}
+        definitions={AskAQuestionFormConfig.defaultDefinitions}
+      />,
+    );
+
+    fireEvent.click(getByText('US Mail'), radioButtonClick);
+    const states = queryAllByText('State', { exact: false });
+
+    const country = getByLabelText(address.country['ui:title'], {
+      exact: false,
+    });
+
+    fireEvent.change(country, { target: { value: 'Aruba' } });
+
+    expect(country).to.have.property('required', true);
+    expect(states[1]).to.not.contain.text('Required');
+  });
 });
