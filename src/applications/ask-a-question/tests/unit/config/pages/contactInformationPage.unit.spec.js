@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { render, fireEvent } from '@testing-library/react';
 
 import ContactInformationPage from '../../../../config/pages/contactInformationPage';
-import AskAQuestionFormConfig from '../../../../config/form';
+import formConfig from '../../../../config/form';
 
 import { DefinitionTester } from 'platform/testing/unit/schemaform-utils';
 import fullName from 'platform/forms-system/src/js/definitions/fullName';
@@ -23,7 +23,7 @@ describe('Contact Information Page', () => {
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -43,7 +43,7 @@ describe('Contact Information Page', () => {
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -59,7 +59,7 @@ describe('Contact Information Page', () => {
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -71,11 +71,11 @@ describe('Contact Information Page', () => {
   });
 
   it('should require email when preferred contact method is email', async () => {
-    const { getAllByText, getByText, getByRole } = render(
+    const { getAllByText, getByText } = render(
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -83,14 +83,8 @@ describe('Contact Information Page', () => {
     fireEvent.click(getByText('Email (Recommended)'), radioButtonClick);
 
     const emails = getAllByText('Email address', { exact: false });
-    const reEnterEmail = getByRole('Re-enter', { exact: false }).querySelector(
-      'input',
-    );
-
-    fireEvent.change(reEnterEmail, { target: { value: 'jane.doe@va.gov' } });
 
     expect(emails[0]).to.contain.text('Required');
-    expect(emails[1]).to.contain.text('Required');
   });
 
   it('should require daytime phone when preferred contact method is phone', async () => {
@@ -98,7 +92,7 @@ describe('Contact Information Page', () => {
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -118,7 +112,7 @@ describe('Contact Information Page', () => {
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
@@ -132,19 +126,19 @@ describe('Contact Information Page', () => {
     const zipCode = getByText('Zip code', { exact: false });
     const states = queryAllByText('State', { exact: false });
 
-    expect(states[1]).to.contain.text('Required'); // this is so janky
+    expect(states[1]).to.contain.text('Required');
     expect(country).to.have.property('required', true);
     expect(street).to.contain.text('Required');
     expect(city).to.contain.text('Required');
     expect(zipCode).to.contain.text('Required');
   });
 
-  it('should require not state for Aruba', async () => {
+  it('should not require state if Aruba is selected from country', async () => {
     const { getByText, queryAllByText, getByLabelText } = render(
       <DefinitionTester
         schema={ContactInformationPage.schema}
         uiSchema={ContactInformationPage.uiSchema}
-        definitions={AskAQuestionFormConfig.defaultDefinitions}
+        definitions={formConfig.defaultDefinitions}
       />,
     );
 
