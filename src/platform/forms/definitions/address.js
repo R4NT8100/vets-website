@@ -38,7 +38,7 @@ function validateAddress(errors, address, formData, currentSchema) {
   if (
     stateRequiredCountries.has(address.country) &&
     address.state === undefined &&
-    currentSchema.required.length
+    currentSchema.required.includes('state')
   ) {
     errors.state.addError('Please select a state or province');
   }
