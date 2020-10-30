@@ -57,6 +57,9 @@ export const veteranStatusUI = {
       requireVetRelationship(formData.veteranStatus.veteranStatus),
     'ui:options': {
       expandUnder: 'veteranStatus',
+      hideIf: formData => {
+        return formData.veteranStatus.relationshipToVeteran === 'Veteran';
+      },
       expandUnderCondition: requireVetRelationship,
     },
   },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { expect } from 'chai';
 
 import { DefinitionTester } from 'platform/testing/unit/schemaform-utils';
@@ -68,6 +68,23 @@ describe('Veteran Status UI', () => {
 
     it('should require relationship to veteran', () => {
       expectRelationshipToVeteranToBeRequired(wrapper);
+    });
+
+    it('when relationship=Veteran should hide the isDeceased input', () => {
+      const relationship = wrapper.getByLabelText(
+        /relationship to the veteran/i,
+      );
+
+      fireEvent.change(relationship, { target: { value: 'Veteran' } });
+
+      const expectOptionToBeSelected = option =>
+        wrapper.getByDisplayValue(option);
+
+      expectOptionToBeSelected('Veteran');
+
+      const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
+
+      expect(isDeceased).to.be.null;
     });
 
     it('should not display date of death when veteran is not deceased', () => {
