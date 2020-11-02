@@ -23,9 +23,6 @@ const requireVetRelationship = selectedVeteranStatus =>
 export const requireServiceInfo = selectedVeteranStatus =>
   selectedVeteranStatus && selectedVeteranStatus !== 'general';
 
-const hideDateOfDeath = selectedVeteranStatus =>
-  selectedVeteranStatus === 'vet' || selectedVeteranStatus === 'general';
-
 export const veteranStatusUI = {
   'ui:description': veteranStatusSectionDescription,
   [formFields.veteranStatus]: {
@@ -69,18 +66,20 @@ export const veteranStatusUI = {
       'ui:options': {
         expandUnder: 'veteranStatus',
         hideIf: formData => {
-          const { veteranStatus, relationshipToVeteran } = formData.veteranStatus;
-          if(veteranStatus === 'vet' || veteranStatus === 'general') {
+          const {
+            veteranStatus,
+            relationshipToVeteran,
+          } = formData.veteranStatus;
+
+          if (veteranStatus === 'vet' || veteranStatus === 'general') {
             return true;
           }
 
-          if(relationshipToVeteran === 'Veteran') {
+          if (relationshipToVeteran === 'Veteran') {
             return true;
-          }          
+          }
 
-          return !!(
-            !formData.veteranStatus.veteranIsDeceased
-          );
+          return !formData.veteranStatus.veteranIsDeceased;
         },
       },
     },
