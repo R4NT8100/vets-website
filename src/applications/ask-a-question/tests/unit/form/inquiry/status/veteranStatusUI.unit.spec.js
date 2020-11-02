@@ -35,6 +35,14 @@ function changeVeteranStatus(wrapper, value) {
   );
 }
 
+function changeDropdownValue(wrapper, dropdown, value) {
+  fireEvent.change(dropdown, { target: { value } });
+
+  const expectOptionToBeSelected = option => wrapper.getByDisplayValue(option);
+
+  expectOptionToBeSelected(value);
+}
+
 describe('Veteran Status UI', () => {
   let wrapper;
 
@@ -75,12 +83,7 @@ describe('Veteran Status UI', () => {
         /relationship to the veteran/i,
       );
 
-      fireEvent.change(relationship, { target: { value: 'Veteran' } });
-
-      const expectOptionToBeSelected = option =>
-        wrapper.getByDisplayValue(option);
-
-      expectOptionToBeSelected('Veteran');
+      changeDropdownValue(wrapper, relationship, 'Veteran');
 
       const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
 
