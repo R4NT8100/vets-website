@@ -69,49 +69,59 @@ describe('Veteran Status UI', () => {
     wrapper && wrapper.unmount();
   });
 
+  describe('when the veteran status is not general or vet', () => {
+    ['behalf of vet', 'dependent'].forEach(veteranStatus => {
+      describe(veteranStatus, () => {
+        beforeEach(() => {
+          changeVeteranStatus(wrapper, veteranStatus);
+        });
+
+        it('should require relationship to veteran', () => {
+          expectRelationshipToVeteranToBeRequired(wrapper);
+        });
+
+        it('when relationship=Veteran should hide the isDeceased input', () => {
+          const relationship = wrapper.getByLabelText(
+            /relationship to the veteran/i,
+          );
+
+          changeDropdownValue(wrapper, relationship, 'Veteran');
+
+          const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
+
+          expect(isDeceased).to.be.null;
+        });
+
+        it('should not display date of death when veteran is not deceased', () => {
+          expectVeteranIsDeceasedToBeRequired(wrapper);
+
+          getRadioOption(wrapper, 'No', 'veteranIsDeceased').click();
+
+          getText(
+            wrapper,
+            veteranStatusUI.dateOfDeath['ui:title'],
+            'veteranStatus',
+          ).shouldNotExist();
+        });
+
+        it('should display date of death when veteran is deceased', () => {
+          expectVeteranIsDeceasedToBeRequired(wrapper);
+
+          getRadioOption(wrapper, 'Yes', 'veteranIsDeceased').click();
+
+          getText(
+            wrapper,
+            veteranStatusUI.dateOfDeath['ui:title'],
+            'veteranStatus',
+          ).shouldExist();
+        });
+      });
+    });
+  });
+
   describe('when veteran status is behalf of vet', () => {
     beforeEach(() => {
       changeVeteranStatus(wrapper, 'behalf of vet');
-    });
-
-    it('should require relationship to veteran', () => {
-      expectRelationshipToVeteranToBeRequired(wrapper);
-    });
-
-    it('when relationship=Veteran should hide the isDeceased input', () => {
-      const relationship = wrapper.getByLabelText(
-        /relationship to the veteran/i,
-      );
-
-      changeDropdownValue(wrapper, relationship, 'Veteran');
-
-      const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
-
-      expect(isDeceased).to.be.null;
-    });
-
-    it('should not display date of death when veteran is not deceased', () => {
-      expectVeteranIsDeceasedToBeRequired(wrapper);
-
-      getRadioOption(wrapper, 'No', 'veteranIsDeceased').click();
-
-      getText(
-        wrapper,
-        veteranStatusUI.dateOfDeath['ui:title'],
-        'veteranStatus',
-      ).shouldNotExist();
-    });
-
-    it('should display date of death when veteran is deceased', () => {
-      expectVeteranIsDeceasedToBeRequired(wrapper);
-
-      getRadioOption(wrapper, 'Yes', 'veteranIsDeceased').click();
-
-      getText(
-        wrapper,
-        veteranStatusUI.dateOfDeath['ui:title'],
-        'veteranStatus',
-      ).shouldExist();
     });
 
     it('should NOT have are you the dependent', () => {
@@ -122,22 +132,6 @@ describe('Veteran Status UI', () => {
   describe('when veteran status is dependent', () => {
     beforeEach(() => {
       changeVeteranStatus(wrapper, 'dependent');
-    });
-
-    it('should require relationship to veteran', () => {
-      expectRelationshipToVeteranToBeRequired(wrapper);
-    });
-
-    it('when relationship=Veteran should hide the isDeceased input', () => {
-      const relationship = wrapper.getByLabelText(
-        /relationship to the veteran/i,
-      );
-
-      changeDropdownValue(wrapper, relationship, 'Veteran');
-
-      const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
-
-      expect(isDeceased).to.be.null;
     });
 
     it('should require are you the dependent', () => {
