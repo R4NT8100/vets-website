@@ -113,11 +113,19 @@ describe('Veteran Status UI', () => {
         'veteranStatus',
       ).shouldExist();
     });
+
+    it('should NOT have are you the dependent', () => {
+      expect(wrapper.queryByText('Are you the dependent?')).not.to.exist;
+    });
   });
 
   describe('when veteran status is dependent', () => {
     beforeEach(() => {
       changeVeteranStatus(wrapper, 'dependent');
+    });
+
+    it('should require relationship to veteran', () => {
+      expectRelationshipToVeteranToBeRequired(wrapper);
     });
 
     it('when relationship=Veteran should hide the isDeceased input', () => {
