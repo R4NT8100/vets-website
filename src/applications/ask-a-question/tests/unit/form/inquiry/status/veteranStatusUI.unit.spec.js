@@ -120,6 +120,18 @@ describe('Veteran Status UI', () => {
       changeVeteranStatus(wrapper, 'dependent');
     });
 
+    it('when relationship=Veteran should hide the isDeceased input', () => {
+      const relationship = wrapper.getByLabelText(
+        /relationship to the veteran/i,
+      );
+
+      changeDropdownValue(wrapper, relationship, 'Veteran');
+
+      const isDeceased = wrapper.queryByText(/Is the Veteran deceased\?/i);
+
+      expect(isDeceased).to.be.null;
+    });
+
     it('should require are you the dependent', () => {
       const isDependent = wrapper.getByText(
         veteranStatusUI.isDependent['ui:title'],
