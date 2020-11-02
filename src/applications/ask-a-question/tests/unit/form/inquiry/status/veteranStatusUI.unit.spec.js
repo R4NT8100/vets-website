@@ -92,6 +92,24 @@ describe('Veteran Status UI', () => {
           expect(isDeceased).to.be.null;
         });
 
+        it('when relationship=Veteran should hide the date of death input', () => {
+          expectVeteranIsDeceasedToBeRequired(wrapper);
+
+          getRadioOption(wrapper, 'Yes', 'veteranIsDeceased').click();
+
+          const queryDateOfDeath = () => wrapper.queryByText(/date of death/i);
+
+          expect(queryDateOfDeath()).to.not.be.null;
+
+          const relationship = wrapper.getByLabelText(
+            /relationship to the veteran/i,
+          );
+
+          changeDropdownValue(wrapper, relationship, 'Veteran');
+
+          expect(queryDateOfDeath()).to.be.null;
+        });
+
         it('should not display date of death when veteran is not deceased', () => {
           expectVeteranIsDeceasedToBeRequired(wrapper);
 

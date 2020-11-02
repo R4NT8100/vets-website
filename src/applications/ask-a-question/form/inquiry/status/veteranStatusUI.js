@@ -69,8 +69,16 @@ export const veteranStatusUI = {
       'ui:options': {
         expandUnder: 'veteranStatus',
         hideIf: formData => {
+          const { veteranStatus, relationshipToVeteran } = formData.veteranStatus;
+          if(veteranStatus === 'vet' || veteranStatus === 'general') {
+            return true;
+          }
+
+          if(relationshipToVeteran === 'Veteran') {
+            return true;
+          }          
+
           return !!(
-            hideDateOfDeath(formData.veteranStatus.veteranStatus) ||
             !formData.veteranStatus.veteranIsDeceased
           );
         },
