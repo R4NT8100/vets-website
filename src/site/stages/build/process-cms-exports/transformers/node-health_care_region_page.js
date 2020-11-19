@@ -2,7 +2,6 @@ const moment = require('moment');
 const { getImageCrop } = require('./helpers');
 const {
   getDrupalValue,
-  getWysiwygString,
   createMetaTagArray,
   uriToUrl,
   isPublished,
@@ -25,7 +24,6 @@ const transform = ({
   fieldOperatingStatus,
   fieldNicknameForThisFacility,
   fieldRelatedLinks,
-  fieldPressReleaseBlurb,
   fieldLinkFacilityEmergList,
   reverseFieldRegionPage,
   reverseFieldOffice,
@@ -56,9 +54,6 @@ const transform = ({
         }
       : null,
   fieldRelatedLinks: fieldRelatedLinks[0],
-  fieldPressReleaseBlurb: {
-    processed: getWysiwygString(getDrupalValue(fieldPressReleaseBlurb)),
-  },
   entityMetatags: createMetaTagArray(metaTags),
   reverseFieldRegionPageNode: {
     entities: reverseFieldRegionPage || [],

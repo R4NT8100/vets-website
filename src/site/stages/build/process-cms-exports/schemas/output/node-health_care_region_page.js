@@ -114,7 +114,6 @@ module.exports = {
     fieldRelatedLinks: {
       $ref: 'output/paragraph-list_of_link_teasers',
     },
-    fieldPressReleaseBlurb: { $ref: 'ProcessedString' },
     fieldMedia: { $ref: 'Media' },
     reverseFieldRegionPageNode: {
       type: 'object',
@@ -163,7 +162,6 @@ module.exports = {
     'fieldOperatingStatus',
     'fieldNicknameForThisFacility',
     'fieldLinkFacilityEmergList',
-    'fieldPressReleaseBlurb',
     'reverseFieldRegionPageNode',
     'newsStoryTeasers',
     'allNewsStoryTeasers',
